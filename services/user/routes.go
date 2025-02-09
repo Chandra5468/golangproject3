@@ -18,7 +18,9 @@ type Handler struct {
 }
 
 func NewHandler(store types.UserStore) *Handler {
-	return &Handler{}
+	return &Handler{
+		store: store,
+	}
 }
 
 // below method takes in the router
