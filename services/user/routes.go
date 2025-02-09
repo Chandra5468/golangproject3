@@ -40,14 +40,15 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// validate the payload
-	if err := utils.Validate.Struct(payload); err != nil {
+	err := utils.Validate.Struct(payload)
+	if err != nil {
 		errors := err.(validator.ValidationErrors) // why do we use . after err.
 		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", errors))
 		return
 	}
 
 	// check if user exists
-	_, err := h.store.GetUserByEmail(payload.Email)
+	_, err = h.store.GetUserByEmail(payload.Email)
 	if err == nil {
 		utils.WriteError(w, http.StatusNotAcceptable, fmt.Errorf("user with email %s already exists", payload.Email))
 		return

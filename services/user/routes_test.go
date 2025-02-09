@@ -43,11 +43,13 @@ func TestUserServiceHandlers(t *testing.T) {
 		}
 	})
 
+	// IMP : WHY THIS BELOW TEST IS FAILING
+	// TEST CHECKING COMMAND go test -v ./...
 	t.Run("should correctly register the user", func(t *testing.T) {
 		payload := types.RegisterUserPayload{
-			FirstName: "user",
-			LastName:  "123",
-			Email:     "valid@gmail.com",
+			FirstName: "user1",
+			LastName:  "1234",
+			Email:     "valid",
 			Password:  "12",
 		}
 

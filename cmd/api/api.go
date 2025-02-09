@@ -29,12 +29,17 @@ func (s *APIServer) Run() error {
 	// Above router is golang inbuilt router.
 	// using gorilla mux from below
 
+	// initializing a new router using mux
 	router := mux.NewRouter()
-	subrouter := router.PathPrefix("/v1/").Subrouter()
+	// adding prefix to all the routes. And return a subrouter. which will match the prefix pattern of all api requests.
+	subrouter := router.PathPrefix("/v1/api/").Subrouter()
 
+	// Below NewStore is method of storage file. Where all sql related ops happen
 	userStore := user.NewStore(s.db)
-	userServiceHandler := user.NewHandler(userStore)
-
+	// userStore is a struct of sql.db fields. AND which has all db ops methods we created
+	// we are passing the struct userStore(which has sql.db) and all db ops to NewHandler, which accepts interface.
+	userServiceHandler := user.NewHandler(userStore) // IMP Implementing interface for userStore struct
+	// This "NewHandler" return interface with method signatures of db ops of userStore
 	userServiceHandler.RegisterRoutes(subrouter)
 	slog.Info("message", "Listening on address", s.addr)
 	return http.ListenAndServe(s.addr, router)

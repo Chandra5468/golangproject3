@@ -16,7 +16,8 @@ func ParseJson(r *http.Request, payload any) error {
 	}
 	// get json payload
 
-	return json.NewDecoder(r.Body).Decode(payload)
+	err := json.NewDecoder(r.Body).Decode(payload)
+	return err
 }
 
 func WriteJson(w http.ResponseWriter, status int, v any) error {
