@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/Chandra5468/golangproject3/services/products"
 	"github.com/Chandra5468/golangproject3/services/user"
 	"github.com/gorilla/mux"
 )
@@ -41,6 +42,10 @@ func (s *APIServer) Run() error {
 	userServiceHandler := user.NewHandler(userStore) // IMP Implementing interface for userStore struct
 	// This "NewHandler" return interface with method signatures of db ops of userStore
 	userServiceHandler.RegisterRoutes(subrouter)
+
+	productStore := products.NewStore(s.db)
+	productHandler := products.NewHandler(productStore)
+	productHandler.RegisterRoutes(subrouter)
 	slog.Info("message", "Listening on address", s.addr)
 	return http.ListenAndServe(s.addr, router)
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/Chandra5468/golangproject3/config"
 	"github.com/Chandra5468/golangproject3/services/auth"
 	"github.com/Chandra5468/golangproject3/types"
 	"github.com/Chandra5468/golangproject3/utils"
@@ -30,6 +31,40 @@ func (h *Handler) RegisterRoutes(router *mux.Router) {
 }
 
 func (h *Handler) handleLogin(w http.ResponseWriter, r *http.Request) {
+	var payload types.LoginUserPayload
+
+	if err := utils.ParseJson(r, &payload); err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	// validate the payload
+	err := utils.Validate.Struct(payload)
+	if err != nil {
+		errors := err.(validator.ValidationErrors) // why do we use . after err.
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", errors))
+		return
+	}
+
+	u, err := h.store.GetUserByEmail(payload.Email)
+
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("not found, invalid email or password"))
+		return
+	}
+
+	if !auth.ComparePasswords(u.Password, []byte(payload.Password)) {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("not found, invalid email or password"))
+		return
+	}
+
+	secret := []byte(config.Envs.JWTSecret)
+	token, err := auth.CreateJWT(secret, u.ID)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+	utils.WriteJson(w, http.StatusOK, map[string]string{"token": token})
 
 }
 
